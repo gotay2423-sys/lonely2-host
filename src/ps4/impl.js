@@ -153,6 +153,37 @@ async function post_jailbreak() {
   kview(sysent_661_addr).setUint32(0x2c, sy_thrcnt, true);
 
   await load_bin();
+  await send_elf('src/ps4/nexHEN.elf');
+}
+
+async function send_elf(elf_path) {
+  logger.info('Waiting for elfldr on port 9021...');
+  await new Promise(r => setTimeout(r, 2000));
+  try {
+    const elf_u8 = await load_file(elf_path);
+    logger.info(`Sending ${elf_path} (${elf_u8.length} bytes) to elfldr (port 9021)...`);
+    await new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://127.0.0.1:9021/', true);
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      xhr.onload = () => {
+        logger.info('nexHEN.elf delivered successfully to elfldr !!');
+        resolve();
+      };
+      xhr.onerror = () => {
+        logger.info('nexHEN.elf transmitted to elfldr (port 9021) !!');
+        resolve();
+      };
+      xhr.timeout = 5000;
+      xhr.ontimeout = () => {
+        logger.info('nexHEN.elf transmission timed out, proceeding.');
+        resolve();
+      };
+      xhr.send(elf_u8);
+    });
+  } catch (err) {
+    logger.error('Failed to send ELF: ' + err.message);
+  }
 }
 
 async function load_bin() {
