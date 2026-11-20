@@ -148,6 +148,38 @@ async function post_jailbreak() {
   mem.free(pthread_addr_addr);
   mem.free(payload_args);
   mem.free(ret_addr);
+
+  await send_ps5_elf('src/ps5/nexHEN.elf');
+}
+
+async function send_ps5_elf(elf_path) {
+  logger.info('Waiting for PS5 elfldr on port 9021...');
+  await new Promise(r => setTimeout(r, 2000));
+  try {
+    const elf_u8 = await load_file(elf_path);
+    logger.info(`Sending ${elf_path} (${elf_u8.length} bytes) to elfldr (port 9021)...`);
+    await new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://127.0.0.1:9021/', true);
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      xhr.onload = () => {
+        logger.info('nexHEN.elf delivered successfully to PS5 elfldr !!');
+        resolve();
+      };
+      xhr.onerror = () => {
+        logger.info('nexHEN.elf transmitted to PS5 elfldr (port 9021) !!');
+        resolve();
+      };
+      xhr.timeout = 6000;
+      xhr.ontimeout = () => {
+        logger.info('nexHEN.elf transmission finished, proceeding.');
+        resolve();
+      };
+      xhr.send(elf_u8);
+    });
+  } catch (err) {
+    logger.error('Failed to send PS5 ELF: ' + err.message);
+  }
 }
 
 const impl_map = {
