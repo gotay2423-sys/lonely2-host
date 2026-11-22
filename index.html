@@ -1,29 +1,389 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lonely2 — Exploit & Payload Host</title>
     <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
+      :root {
+        --cyan: #00f3ff;
+        --pink: #ff007f;
+        --purple: #9d4edd;
+        --green: #39ff14;
+        --gold: #ffd000;
+        --bg-dark: #0a0414;
+        --panel-bg: rgba(16, 7, 34, 0.92);
+        --border-cyan: rgba(0, 243, 255, 0.4);
       }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 50% -20%, rgba(157, 78, 221, 0.25), transparent 60%),
+          linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(180deg, #100520 0%, #07020e 100%);
+        background-size: 100% 100%, 32px 32px, 32px 32px, 100% 100%;
+        background-attachment: fixed;
+        color: #e2e8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 16px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 860px;
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        margin-bottom: 18px;
+      }
+
+      .header h1 {
+        font-size: 40px;
+        font-weight: 900;
+        letter-spacing: 5px;
+        margin: 0;
+        text-transform: uppercase;
+        color: var(--cyan);
+        text-shadow: 0 0 12px var(--cyan), 0 0 30px rgba(0, 243, 255, 0.4);
+      }
+
+      .header p {
+        color: #9d83c7;
+        font-size: 12.5px;
+        letter-spacing: 2px;
+        margin-top: 6px;
+        text-transform: uppercase;
+      }
+
+      /* Status Badges */
+      .status-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        background: rgba(22, 9, 44, 0.85);
+        border: 1px solid var(--border-cyan);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      }
+
+      .badge-elfldr {
+        color: var(--gold);
+        border-color: rgba(255, 208, 0, 0.5);
+      }
+
+      /* Terminal Chrome Bar */
+      .terminal-bar {
+        background: #140726;
+        border: 1px solid var(--border-cyan);
+        border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11.5px;
+        font-family: 'Consolas', 'Courier New', monospace;
+      }
+
+      .terminal-dots { display: flex; gap: 7px; }
+      .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+      .dot-red { background: #ff2a55; }
+      .dot-yellow { background: var(--gold); }
+      .dot-green { background: var(--green); }
+
+      .terminal-title {
+        color: #bfa5dc;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+
+      /* Console pre */
       #console {
         width: 100%;
-        height: 100%;
+        height: 240px;
         margin: 0;
-        padding: 20px;
+        padding: 14px 18px;
         font-size: 12px;
-        overflow: auto;
-        box-sizing: border-box;
-        font-family: 'Lucida Console', 'Courier New', 'Menlo';
-        background-color: #131416;
-        color: #c1c2c5;
+        line-height: 1.6;
+        overflow-y: auto;
+        font-family: 'Lucida Console', 'Consolas', 'Courier New', monospace;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-cyan);
+        border-top: none;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        color: var(--cyan);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 243, 255, 0.05);
+      }
+
+      #console::-webkit-scrollbar { width: 6px; }
+      #console::-webkit-scrollbar-track { background: rgba(10, 4, 20, 0.6); }
+      #console::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+      /* Payload Menu Section */
+      .payload-section {
+        margin-top: 24px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-cyan);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+      }
+
+      .payload-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+      }
+
+      .payload-title {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--cyan);
+        text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+      }
+
+      .payload-subtitle {
+        font-size: 11.5px;
+        color: #9d83c7;
+        letter-spacing: 1px;
+      }
+
+      .payload-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+      }
+
+      .payload-card {
+        background: linear-gradient(140deg, rgba(28, 12, 50, 0.85) 0%, rgba(12, 5, 24, 0.95) 100%);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        border-radius: 10px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      }
+
+      .payload-card:hover {
+        border-color: var(--cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 243, 255, 0.25);
+      }
+
+      .p-info {
+        flex-grow: 1;
+        min-width: 0;
+      }
+
+      .p-name {
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: 1px;
+      }
+
+      .p-desc {
+        font-size: 11px;
+        color: #9d83c7;
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .btn-payload {
+        background: rgba(0, 243, 255, 0.15);
+        border: 1px solid var(--cyan);
+        color: var(--cyan);
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 800;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .btn-payload:hover:not(:disabled) {
+        background: var(--cyan);
+        color: #05020a;
+        box-shadow: 0 0 14px var(--cyan);
+      }
+
+      .btn-payload:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-success {
+        border-color: var(--green) !important;
+        color: var(--green) !important;
+        background: rgba(57, 255, 20, 0.15) !important;
+      }
+
+      .payload-hint {
+        margin-top: 14px;
+        font-size: 11px;
+        color: #8c72b2;
+        text-align: center;
+        line-height: 1.5;
       }
     </style>
     <script src="src/main.js" defer></script>
-    <title>Wobkot</title>
   </head>
   <body>
-    <pre id="console"></pre>
+    <div class="container">
+      <div class="header">
+        <h1>Lonely 2</h1>
+        <p>PlayStation Exploit Host &middot; Manual Payload Dispatch</p>
+      </div>
+
+      <div class="status-row">
+        <div class="badge" id="hostStatus">EXPLOIT: INITIALIZING...</div>
+        <div class="badge badge-elfldr" id="elfldrStatus">ELFLDR: WAITING</div>
+      </div>
+
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="terminal-title">lonely2@wobkot: ~/exploit</div>
+        <div class="terminal-port">PORT: 9021</div>
+      </div>
+
+      <pre id="console"></pre>
+
+      <!-- Manual Payload Menu -->
+      <div class="payload-section">
+        <div class="payload-header">
+          <span class="payload-title">Manual Payloads</span>
+          <span class="payload-subtitle">Inject into elfldr on port 9021</span>
+        </div>
+
+        <div class="payload-grid">
+          <div class="payload-card">
+            <div class="p-info">
+              <div class="p-name">nexHEN</div>
+              <div class="p-desc">Homebrew Enabler &amp; Debug Settings (1.53 MB)</div>
+            </div>
+            <button type="button" class="btn-payload" id="btnNexHEN" onclick="sendPayload('src/ps4/nexHEN.elf', this)">SEND</button>
+          </div>
+        </div>
+
+        <div class="payload-hint">
+          &bull; The exploit runs clean with elfldr on port 9021. Click <b>SEND</b> to dispatch nexHEN, or send any custom payload remotely from your PC.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function sendPayload(path, btn) {
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'SENDING...';
+        }
+        logger.info(`Manual payload requested: ${path}`);
+        try {
+          logger.info(`Loading ${path}...`);
+          const res = await fetch(path);
+          if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to load ${path}`);
+          const buf = await res.arrayBuffer();
+          const u8 = new Uint8Array(buf);
+          logger.info(`Sending ${path} (${u8.length} bytes) to elfldr (port 9021)...`);
+
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', 'http://127.0.0.1:9021/', true);
+          xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+          xhr.onload = function() {
+            logger.info(`${path} delivered successfully to elfldr (port 9021)!`);
+            if (btn) {
+              btn.textContent = 'SENT!';
+              btn.classList.add('btn-success');
+              setTimeout(function() {
+                btn.disabled = false;
+                btn.textContent = 'SEND';
+                btn.classList.remove('btn-success');
+              }, 3000);
+            }
+          };
+          xhr.onerror = function() {
+            logger.info(`${path} transmitted to port 9021!`);
+            if (btn) {
+              btn.textContent = 'SENT!';
+              setTimeout(function() {
+                btn.disabled = false;
+                btn.textContent = 'SEND';
+              }, 3000);
+            }
+          };
+          xhr.timeout = 8000;
+          xhr.ontimeout = function() {
+            logger.error(`Transmission to port 9021 timed out.`);
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = 'RETRY';
+            }
+          };
+          xhr.send(u8);
+        } catch (err) {
+          logger.error(`Failed to send payload: ${err.message}`);
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'RETRY';
+          }
+        }
+      }
+      window.sendPayload = sendPayload;
+
+      window.onElfldrReady = function() {
+        var hostStatus = document.getElementById('hostStatus');
+        if (hostStatus) {
+          hostStatus.textContent = 'EXPLOIT: READY';
+          hostStatus.style.color = '#39ff14';
+          hostStatus.style.borderColor = '#39ff14';
+        }
+        var elfldrStatus = document.getElementById('elfldrStatus');
+        if (elfldrStatus) {
+          elfldrStatus.textContent = 'ELFLDR: LISTENING (:9021)';
+          elfldrStatus.style.color = '#00f3ff';
+          elfldrStatus.style.borderColor = '#00f3ff';
+        }
+      };
+    </script>
   </body>
 </html>

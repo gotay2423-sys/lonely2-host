@@ -179,19 +179,15 @@ async function load_bin() {
   const pthread_addr = arw.view(pthread_addr_addr).getBInt(0, true);
   const pthread_id = arw.view(pthread_addr).getBInt(0, true);
 
-  logger.info(`Created bin thread with id ${pthread_id} !!`);
-
-  const ret_addr = mem.alloc(8);
-
-  if (fn.pthread_join.invoke(pthread_addr, ret_addr)) {
-    throw new Error(`Unable to join thread ${pthread_id} !!`);
-  }
-
-  const ret = arw.view(ret_addr).getInt32(0, true);
-
-  logger.info(`bin returned ${ret} !!`);
+  logger.info(`Started elfldr daemon with thread id ${pthread_id} !!`);
+  logger.info('PS4 elfldr is now listening on port 9021!');
+  logger.info('System is clean. Ready for manual payload selection.');
 
   mem.free(pthread_addr_addr);
+
+  if (typeof window.onElfldrReady === 'function') {
+    window.onElfldrReady();
+  }
 }
 
 const impl_map = {
