@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lonely2 — Exploit & Payload Host</title>
+    <title>Lonely 2 — PlayStation Exploit Host</title>
     <style>
       :root {
         --cyan: #00f3ff;
@@ -85,6 +85,11 @@
         letter-spacing: 1.5px;
         text-transform: uppercase;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      }
+
+      .badge-fw {
+        color: var(--cyan);
+        border-color: rgba(0, 243, 255, 0.5);
       }
 
       .badge-elfldr {
@@ -176,82 +181,28 @@
         letter-spacing: 1px;
       }
 
-      .payload-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 14px;
-      }
-
-      .payload-card {
-        background: linear-gradient(140deg, rgba(28, 12, 50, 0.85) 0%, rgba(12, 5, 24, 0.95) 100%);
-        border: 1px solid rgba(0, 243, 255, 0.3);
+      .payload-status-box {
+        background: rgba(22, 9, 44, 0.6);
+        border: 1px dashed rgba(0, 243, 255, 0.35);
         border-radius: 10px;
-        padding: 14px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        padding: 16px 20px;
+        text-align: center;
       }
 
-      .payload-card:hover {
-        border-color: var(--cyan);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 243, 255, 0.25);
+      .status-msg {
+        margin: 0;
+        font-size: 12.5px;
+        color: #c4b5fd;
+        line-height: 1.8;
       }
 
-      .p-info {
-        flex-grow: 1;
-        min-width: 0;
-      }
-
-      .p-name {
-        font-size: 14.5px;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: 1px;
-      }
-
-      .p-desc {
-        font-size: 11px;
-        color: #9d83c7;
-        margin-top: 3px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .btn-payload {
-        background: rgba(0, 243, 255, 0.15);
-        border: 1px solid var(--cyan);
+      .status-msg b {
         color: var(--cyan);
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-size: 12px;
-        font-family: inherit;
-        font-weight: 800;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
       }
 
-      .btn-payload:hover:not(:disabled) {
-        background: var(--cyan);
-        color: #05020a;
-        box-shadow: 0 0 14px var(--cyan);
-      }
-
-      .btn-payload:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .btn-success {
-        border-color: var(--green) !important;
-        color: var(--green) !important;
-        background: rgba(57, 255, 20, 0.15) !important;
+      .status-msg i {
+        color: #9d83c7;
+        font-size: 11.5px;
       }
 
       .payload-hint {
@@ -268,10 +219,11 @@
     <div class="container">
       <div class="header">
         <h1>Lonely 2</h1>
-        <p>PlayStation Exploit Host &middot; Manual Payload Dispatch</p>
+        <p>PlayStation 4 &amp; 5 Exploit Host &middot; FW 9.00 &ndash; 14.02 &middot; Clean Loader</p>
       </div>
 
       <div class="status-row">
+        <div class="badge badge-fw" id="fwBadge">FW 9.00 &ndash; 14.02</div>
         <div class="badge" id="hostStatus">EXPLOIT: INITIALIZING...</div>
         <div class="badge badge-elfldr" id="elfldrStatus">ELFLDR: WAITING</div>
       </div>
@@ -291,89 +243,30 @@
       <!-- Manual Payload Menu -->
       <div class="payload-section">
         <div class="payload-header">
-          <span class="payload-title">Manual Payloads</span>
-          <span class="payload-subtitle">Inject into elfldr on port 9021</span>
+          <span class="payload-title">Payload Menu</span>
+          <span class="payload-subtitle">ELFLDR on port 9021 &middot; Clean Mode</span>
         </div>
 
-        <div class="payload-grid">
-          <div class="payload-card">
-            <div class="p-info">
-              <div class="p-name">nexHEN</div>
-              <div class="p-desc">Homebrew Enabler &amp; Debug Settings (1.53 MB)</div>
-            </div>
-            <button type="button" class="btn-payload" id="btnNexHEN" onclick="sendPayload('src/ps4/nexHEN.elf', this)">SEND</button>
-          </div>
+        <div class="payload-status-box">
+          <p class="status-msg">
+            &#9656; <b>Clean Boot Mode Active:</b> Exploit completes without auto-injecting payloads.<br>
+            &#9656; <b>Port 9021 Listening:</b> Ready to accept payloads remotely from PC/LAN (e.g. Netcat).<br>
+            &#9656; <i>Payload options will be added here for manual in-browser dispatch.</i>
+          </p>
         </div>
 
         <div class="payload-hint">
-          &bull; The exploit runs clean with elfldr on port 9021. Click <b>SEND</b> to dispatch nexHEN, or send any custom payload remotely from your PC.
+          &bull; The system runs clean with elfldr on port 9021. You can send any custom payload remotely to port 9021, and manual payload buttons will be added in upcoming updates.
         </div>
       </div>
     </div>
 
     <script>
-      async function sendPayload(path, btn) {
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = 'SENDING...';
-        }
-        logger.info(`Manual payload requested: ${path}`);
-        try {
-          logger.info(`Loading ${path}...`);
-          const res = await fetch(path);
-          if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to load ${path}`);
-          const buf = await res.arrayBuffer();
-          const u8 = new Uint8Array(buf);
-          logger.info(`Sending ${path} (${u8.length} bytes) to elfldr (port 9021)...`);
-
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', 'http://127.0.0.1:9021/', true);
-          xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-          xhr.onload = function() {
-            logger.info(`${path} delivered successfully to elfldr (port 9021)!`);
-            if (btn) {
-              btn.textContent = 'SENT!';
-              btn.classList.add('btn-success');
-              setTimeout(function() {
-                btn.disabled = false;
-                btn.textContent = 'SEND';
-                btn.classList.remove('btn-success');
-              }, 3000);
-            }
-          };
-          xhr.onerror = function() {
-            logger.info(`${path} transmitted to port 9021!`);
-            if (btn) {
-              btn.textContent = 'SENT!';
-              setTimeout(function() {
-                btn.disabled = false;
-                btn.textContent = 'SEND';
-              }, 3000);
-            }
-          };
-          xhr.timeout = 8000;
-          xhr.ontimeout = function() {
-            logger.error(`Transmission to port 9021 timed out.`);
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = 'RETRY';
-            }
-          };
-          xhr.send(u8);
-        } catch (err) {
-          logger.error(`Failed to send payload: ${err.message}`);
-          if (btn) {
-            btn.disabled = false;
-            btn.textContent = 'RETRY';
-          }
-        }
-      }
-      window.sendPayload = sendPayload;
-
+      // Global hook when elfldr starts successfully
       window.onElfldrReady = function() {
         var hostStatus = document.getElementById('hostStatus');
         if (hostStatus) {
-          hostStatus.textContent = 'EXPLOIT: READY';
+          hostStatus.textContent = 'EXPLOIT: READY (CLEAN)';
           hostStatus.style.color = '#39ff14';
           hostStatus.style.borderColor = '#39ff14';
         }
@@ -384,6 +277,25 @@
           elfldrStatus.style.borderColor = '#00f3ff';
         }
       };
+
+      // Update FW badge if console is detected
+      window.addEventListener('DOMContentLoaded', function() {
+        try {
+          var ua = navigator.userAgent;
+          var match = /PlayStation\s+(\d+)[/ ](\d+)\.(\d+)/.exec(ua);
+          if (match) {
+            var con = match[1];
+            var maj = match[2];
+            var min = parseInt(match[3], 16).toString(16).padStart(2, '0');
+            var fwEl = document.getElementById('fwBadge');
+            if (fwEl) {
+              fwEl.textContent = 'PS' + con + ' FW ' + maj + '.' + min + ' (SUPPORTED)';
+              fwEl.style.color = '#39ff14';
+              fwEl.style.borderColor = '#39ff14';
+            }
+          }
+        } catch(e) {}
+      });
     </script>
   </body>
 </html>
