@@ -12,6 +12,13 @@ const version = {
 
     const match = /PlayStation\s+(\d+)[/ ](\d+)\.(\d+)/.exec(ua);
     if (!match) {
+      if (window.fw_override) {
+        const parts = String(window.fw_override).split('.');
+        this.console = 4;
+        this.major = Number.parseInt(parts[0], 10);
+        this.minor = Number.parseInt(parts[1] || '0', 16);
+        return;
+      }
       throw new Error(`Unsupported user agent: ${ua}`);
     }
 

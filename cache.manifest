@@ -1,0 +1,27 @@
+CACHE MANIFEST
+# Lonely Host PS4 Offline Cache v1.0 - God of War Edition
+# 2026-11-25
+
+CACHE:
+index.html
+gow_bg.jpg
+kratos_crest.png
+prestige.jpg
+src/main.js
+src/site.js
+src/misc.js
+src/thread.js
+src/userland.js
+src/kernel.js
+src/lapse.js
+src/worker.js
+src/ps4/impl.js
+src/ps4/payload.bin
+src/ps5/impl.js
+src/ps5/kexp.bin
+src/ps5/elfldr.elf
+src/ps5/nexHEN.elf
+src/ps5/relapse.js
+
+NETWORK:
+*

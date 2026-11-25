@@ -649,6 +649,9 @@ async function kernel_main() {
     jailbreak();
 
     notify('Jailbroken !!');
+    if (typeof window.showJbSuccessPopup === 'function') {
+      window.showJbSuccessPopup('Kernel Conquered &bull; Midgard Secured');
+    }
 
     await post_jailbreak();
   }
