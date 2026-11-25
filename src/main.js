@@ -5,35 +5,19 @@ const logger = {
     this.console = document.getElementById('console');
   },
   info(msg) {
-    this.log('[+]', `${msg}`, 'info');
+    this.log('[+]', `${msg}`);
   },
   error(msg) {
-    this.log('[-]', `${msg}`, 'error');
+    this.log('[-]', `${msg}`);
   },
   debug(msg) {
-    if (this.verbose) this.log('[*]', `${msg}`, 'debug');
+    if (this.verbose) this.log('[*]', `${msg}`);
   },
-  log(prefix, msg, type = 'info') {
+  log(prefix, msg) {
     if (!this.console) return;
 
-    let line = document.createElement('div');
-    if (type === 'error') {
-      line.className = 'log-error';
-    } else if (type === 'info') {
-      line.className = 'log-info';
-    } else {
-      line.className = 'log-info';
-      line.style.opacity = '0.75';
-    }
-    line.textContent = `${prefix} ${String(msg)}`;
-    this.console.appendChild(line);
-
-    // Keep internal scroll at bottom without moving parent window scroll position
-    const prevWindowY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    this.console.append(`${prefix} ${String(msg).replace(/\n/g, `\n${prefix} `)}\n`);
     this.console.scrollTop = this.console.scrollHeight;
-    if ((window.pageYOffset || document.documentElement.scrollTop || 0) !== prevWindowY) {
-      window.scrollTo(0, prevWindowY);
-    }
   },
 };
 
@@ -86,36 +70,27 @@ async function load_file(src) {
 }
 
 async function main() {
-  if (window._exploitRunning) return;
-  window._exploitRunning = true;
+  await load_script('src/misc.js');
 
-  try {
-    await load_script('src/misc.js');
+  version.init();
 
-    version.init();
-
-    switch (version.console) {
-      case 4:
-        await load_script('src/ps4/impl.js');
-        break;
-      case 5:
-        await load_script('src/ps5/impl.js');
-        break;
-      default:
-        throw new Error(`Unsupported console ${version.console}`);
-    }
-
-    await load_script('src/userland.js');
-    await userland_main();
-
-    await load_script('src/kernel.js');
-    await kernel_main();
-  } catch (err) {
-    window._exploitRunning = false;
-    throw err;
+  switch (version.console) {
+    case 4:
+      await load_script('src/ps4/impl.js');
+      break;
+    case 5:
+      await load_script('src/ps5/impl.js');
+      break;
+    default:
+      throw new Error(`Unsupported console ${version.console}`);
   }
+
+  await load_script('src/userland.js');
+  await userland_main();
+
+  await load_script('src/kernel.js');
+  await kernel_main();
 }
 
 logger.init();
-window.runExploit = main;
-window.logger = logger;
+main();

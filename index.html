@@ -1,1166 +1,1218 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" manifest="cache.manifest">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lonely 2 — PS4 Exploit Host (God of War Edition)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
-  <style>
-    /* ==========================================================================
-       BACKGROUND & PANEL OPACITY SETTINGS (EDIT HERE OR USE IN-APP GLASS BUTTON)
-       --bg-dim-opacity: 0.0 (crystal-clear art) to 0.85 (dark tint). Default: 0.28
-       --panel-opacity:  0.15 (high glass transparency) to 1.0 (solid). Default: 0.50
-       ========================================================================== */
-    :root {
-      --bg-dim-opacity: 0.28;
-      --panel-opacity: 0.50;
-
-      --gow-crimson: #c01515;
-      --gow-crimson-bright: #e63946;
-      --gow-crimson-dark: #6e0c0c;
-      --gow-gold: #d4af37;
-      --gow-gold-light: #f5d77f;
-      --gow-frost: #00f0ff;
-      --gow-frost-glow: rgba(0, 240, 255, 0.45);
-      --gow-ash: #e2e8f0;
-      --gow-slate-dark: #080a0f;
-      --gow-panel-bg: rgba(12, 16, 26, var(--panel-opacity));
-      --gow-card-bg: rgba(16, 22, 34, calc(var(--panel-opacity) + 0.08));
-      --gow-border-gold: rgba(212, 175, 55, 0.45);
-      --gow-border-crimson: rgba(192, 21, 21, 0.45);
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      background:
-        linear-gradient(180deg, rgba(10, 13, 20, var(--bg-dim-opacity)) 0%, rgba(5, 7, 12, calc(var(--bg-dim-opacity) + 0.14)) 100%),
-        url('./gow_bg.jpg');
-      background-size: cover, cover;
-      background-position: center top;
-      background-attachment: fixed;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 20px 16px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-      width: 100%;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 860px;
-      min-width: 0;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Top Navigation Hub */
-    .top-nav-hub {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .nav-hub-link {
-      background: rgba(18, 22, 34, 0.85);
-      border: 1px solid var(--gow-border-gold);
-      color: var(--gow-gold-light);
-      padding: 6px 16px;
-      border-radius: 18px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      font-family: 'Cinzel', serif;
-    }
-
-    .nav-hub-link:hover {
-      border-color: var(--gow-crimson-bright);
-      color: #ffffff;
-      box-shadow: 0 0 14px rgba(230, 57, 70, 0.6);
-    }
-
-    .nav-hub-link.nav-ps5 {
-      border-color: rgba(0, 240, 255, 0.4);
-      color: var(--gow-frost);
-    }
-
-    /* Glass Opacity Toggle Button */
-    .glass-btn {
-      background: rgba(22, 28, 44, 0.85);
-      border-color: var(--gow-border-gold);
-      color: var(--gow-gold-light);
-      cursor: pointer;
-    }
-    .glass-btn:hover {
-      box-shadow: 0 0 14px rgba(212, 175, 55, 0.6);
-      color: #ffffff;
-    }
-
-    /* God of War Header Banner */
-    .gow-header-banner {
-      position: relative;
-      background: linear-gradient(180deg, rgba(20, 25, 40, var(--panel-opacity)) 0%, rgba(10, 13, 22, calc(var(--panel-opacity) + 0.08)) 100%);
-      border: 2px solid var(--gow-border-gold);
-      border-radius: 20px;
-      padding: 22px 20px 20px 20px;
-      margin-bottom: 20px;
-      text-align: center;
-      overflow: hidden;
-      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(192, 21, 21, 0.2), inset 0 0 25px rgba(212, 175, 55, 0.08);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    /* Corner Nordic Knot Accents */
-    .gow-header-banner::before {
-      content: "ᛟ ᚱ ᛒ ᛁ ᛋ";
-      position: absolute;
-      top: 8px;
-      left: 14px;
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: rgba(212, 175, 55, 0.4);
-      font-family: serif;
-    }
-    .gow-header-banner::after {
-      content: "ᛈ ᛋ ᛏ";
-      position: absolute;
-      top: 8px;
-      right: 14px;
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: rgba(0, 240, 255, 0.4);
-      font-family: serif;
-    }
-
-    /* Kratos God of War Shield Crest */
-    .kratos-crest-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 14px;
-      position: relative;
-    }
-
-    .kratos-crest-frame {
-      position: relative;
-      width: 136px;
-      height: 136px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    @keyframes runic-spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .kratos-runic-orbit {
-      position: absolute;
-      inset: -8px;
-      border-radius: 50%;
-      border: 1.5px dashed rgba(212, 175, 55, 0.6);
-      box-shadow: 
-        0 0 25px rgba(230, 57, 70, 0.5), 
-        0 0 45px rgba(212, 175, 55, 0.3), 
-        inset 0 0 15px rgba(192, 21, 21, 0.25);
-      z-index: 1;
-      pointer-events: none;
-      animation: runic-spin 30s linear infinite;
-      will-change: transform;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-
-    .kratos-medallion {
-      position: relative;
-      width: 126px;
-      height: 126px;
-      border-radius: 50%;
-      border: 3.5px solid var(--gow-gold);
-      box-shadow: 
-        0 0 22px rgba(212, 175, 55, 0.85), 
-        0 0 45px rgba(230, 57, 70, 0.7), 
-        inset 0 0 16px rgba(0, 0, 0, 0.95);
-      overflow: hidden;
-      background: radial-gradient(circle, #2a221f 0%, #0d0f17 100%);
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .kratos-medallion img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: contrast(1.15) brightness(1.02) saturate(1.08);
-      transform: scale(1.02);
-    }
-
-    .kratos-medallion-glare {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: 
-        radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 65%, rgba(10, 13, 20, 0.75) 100%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 45%, rgba(230, 57, 70, 0.25) 100%);
-      pointer-events: none;
-      box-shadow: inset 0 0 14px rgba(212, 175, 55, 0.7), inset 0 0 22px rgba(0, 0, 0, 0.6);
-    }
-
-    .gow-title {
-      font-family: 'Cinzel Decorative', 'Cinzel', serif;
-      font-size: 52px;
-      font-weight: 900;
-      letter-spacing: 8px;
-      text-transform: uppercase;
-      margin: 0;
-      background: linear-gradient(180deg, #ffffff 0%, #f5d77f 35%, #d4af37 70%, #9e791b 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 18px rgba(212, 175, 55, 0.7)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95));
-      line-height: 1.1;
-    }
-
-    .gow-subtitle {
-      font-family: 'Cinzel', serif;
-      font-size: 13.5px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: var(--gow-crimson-bright);
-      text-shadow: 0 0 10px rgba(230, 57, 70, 0.65), 0 0 20px rgba(192, 21, 21, 0.4);
-      margin-top: 6px;
-      text-transform: uppercase;
-    }
-
-    .gow-tagline {
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: #94a3b8;
-      margin-top: 6px;
-      text-transform: uppercase;
-    }
-
-    /* Status Chips */
-    .status-container {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 22px;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      background: rgba(18, 22, 34, 0.9);
-      border: 1px solid var(--gow-border-gold);
-      padding: 7px 18px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.08);
-      display: flex;
-      align-items: center;
-      color: var(--gow-gold-light);
-      font-family: 'Cinzel', serif;
-    }
-
-    .fw-chip {
-      color: var(--gow-gold-light);
-      border-color: var(--gow-gold);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(212, 175, 55, 0.15);
-    }
-
-    .status-chip {
-      color: var(--gow-frost);
-      border-color: rgba(0, 240, 255, 0.45);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 240, 255, 0.1);
-    }
-
-    .elfldr-chip {
-      color: var(--gow-gold);
-      border-color: rgba(255, 208, 0, 0.5);
-    }
-
-    .cache-chip {
-      color: var(--gow-gold-light);
-      border-color: var(--gow-border-gold);
-    }
-
-    .reset-chip {
-      color: var(--gow-crimson-bright);
-      border-color: rgba(230, 57, 70, 0.5);
-      background: rgba(35, 10, 15, 0.85);
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .reset-chip:hover {
-      background: rgba(230, 57, 70, 0.25);
-      box-shadow: 0 0 16px rgba(230, 57, 70, 0.7);
-    }
-
-    .led {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-      background: var(--gow-frost);
-      box-shadow: 0 0 8px var(--gow-frost);
-    }
-    .led-green { background: #00ffaa; box-shadow: 0 0 8px #00ffaa; }
-    .led-yellow { background: var(--gow-gold-light); box-shadow: 0 0 8px var(--gow-gold-light); }
-    .led-red { background: var(--gow-crimson-bright); box-shadow: 0 0 8px var(--gow-crimson-bright); }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    #runBtn {
-      background: linear-gradient(180deg, #321014 0%, #1c0a0c 100%);
-      color: #ffffff;
-      border: 2px solid var(--gow-border-gold);
-      padding: 14px 44px;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 3px;
-      border-radius: 28px;
-      cursor: pointer;
-      text-transform: uppercase;
-      font-family: 'Cinzel', serif;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(192, 21, 21, 0.4), inset 0 0 12px rgba(212, 175, 55, 0.2);
-      transition: all 0.25s ease;
-    }
-
-    #runBtn:hover {
-      background: linear-gradient(180deg, #5c141a 0%, #2e0c10 100%);
-      border-color: var(--gow-gold-light);
-      box-shadow: 0 0 28px rgba(230, 57, 70, 0.8), 0 0 18px rgba(212, 175, 55, 0.6);
-      transform: translateY(-2px);
-    }
-
-    #runBtn.btn-success {
-      background: linear-gradient(180deg, #163824 0%, #0c1f14 100%) !important;
-      border-color: #00ffaa !important;
-      color: #00ffaa !important;
-      box-shadow: 0 0 24px rgba(0, 255, 170, 0.5), inset 0 0 12px rgba(0, 255, 170, 0.2) !important;
-    }
-
-    #runBtn:disabled {
-      opacity: 0.85;
-      cursor: wait;
-    }
-
-    .auto-run-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: #94a3b8;
-      cursor: pointer;
-    }
-
-    .toggle-wrap input { display: none; }
-
-    .toggle-slider {
-      width: 36px;
-      height: 20px;
-      background: rgba(18, 22, 34, 0.9);
-      border: 1px solid var(--gow-border-gold);
-      border-radius: 10px;
-      position: relative;
-      transition: all 0.2s ease;
-    }
-
-    .toggle-slider::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 14px;
-      height: 14px;
-      background: var(--gow-gold);
-      border-radius: 50%;
-      transition: all 0.2s ease;
-    }
-
-    .toggle-wrap input:checked + .toggle-slider {
-      background: rgba(192, 21, 21, 0.5);
-      border-color: var(--gow-crimson-bright);
-    }
-
-    .toggle-wrap input:checked + .toggle-slider::after {
-      left: 18px;
-      background: var(--gow-crimson-bright);
-      box-shadow: 0 0 8px var(--gow-crimson-bright);
-    }
-
-    /* Terminal Console */
-    .terminal-bar {
-      background: rgba(18, 22, 34, calc(var(--panel-opacity) + 0.15));
-      border: 1px solid var(--gow-border-gold);
-      border-bottom: 1px solid rgba(0, 240, 255, 0.25);
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
-      padding: 10px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11.5px;
-      font-family: 'Cinzel', serif;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    .terminal-dots { display: flex; gap: 8px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .dot-red { background: var(--gow-crimson-bright); box-shadow: 0 0 6px var(--gow-crimson-bright); }
-    .dot-yellow { background: var(--gow-gold); box-shadow: 0 0 6px var(--gow-gold); }
-    .dot-green { background: var(--gow-frost); box-shadow: 0 0 6px var(--gow-frost); }
-
-    .terminal-title {
-      color: var(--gow-gold-light);
-      letter-spacing: 1.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      font-size: 11.5px;
-    }
-
-    .terminal-port {
-      color: var(--gow-frost);
-      opacity: 0.95;
-      font-size: 11px;
-      letter-spacing: 1px;
-      font-weight: 800;
-    }
-
-    #console {
-      background: var(--gow-panel-bg);
-      border: 1px solid var(--gow-border-gold);
-      border-top: none;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
-      padding: 16px 18px;
-      height: 260px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 12.5px;
-      line-height: 1.6;
-      color: var(--gow-frost);
-      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-sizing: border-box;
-    }
-
-    #console div {
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    #console::-webkit-scrollbar, .payload-grid::-webkit-scrollbar { width: 7px; }
-    #console::-webkit-scrollbar-track, .payload-grid::-webkit-scrollbar-track {
-      background: rgba(10, 13, 20, 0.6);
-      border-radius: 4px;
-    }
-    #console::-webkit-scrollbar-thumb, .payload-grid::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--gow-gold), var(--gow-crimson));
-      border-radius: 4px;
-      box-shadow: 0 0 8px var(--gow-crimson);
-    }
-
-    .log-info { color: var(--gow-frost); text-shadow: 0 0 5px rgba(0, 240, 255, 0.4); }
-    .log-success { color: #00ffaa; text-shadow: 0 0 6px rgba(0, 255, 170, 0.5); font-weight: bold; }
-    .log-error { color: var(--gow-crimson-bright); text-shadow: 0 0 6px rgba(230, 57, 70, 0.6); font-weight: bold; }
-
-    /* Armory Payloads Section */
-    .payload-section {
-      margin-top: 22px;
-      background: var(--gow-panel-bg);
-      border: 1px solid var(--gow-border-gold);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.06);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    .payload-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--gow-border-gold);
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .payload-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--gow-gold-light);
-      font-family: 'Cinzel', serif;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .payload-subtitle {
-      font-size: 11px;
-      color: #94a3b8;
-      letter-spacing: 0.5px;
-    }
-
-    /* Live Search Input */
-    .payload-search-bar {
-      margin-bottom: 14px;
-      display: flex;
-    }
-    .payload-search-input {
-      width: 100%;
-      background: rgba(14, 18, 28, 0.85);
-      border: 1px solid var(--gow-border-gold);
-      border-radius: 8px;
-      padding: 9px 14px;
-      color: var(--gow-gold-light);
-      font-size: 12px;
-      font-family: inherit;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-    .payload-search-input:focus {
-      border-color: var(--gow-crimson-bright);
-      box-shadow: 0 0 12px rgba(230, 57, 70, 0.4);
-    }
-    .payload-search-input::placeholder {
-      color: #64748b;
-    }
-
-    /* Realm Tabs */
-    .realm-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .realm-tab {
-      background: rgba(18, 22, 34, 0.7);
-      border: 1px solid var(--gow-border-gold);
-      color: #94a3b8;
-      padding: 6px 14px;
-      border-radius: 16px;
-      font-size: 10.5px;
-      font-weight: 800;
-      letter-spacing: 1.2px;
-      font-family: 'Cinzel', serif;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-    }
-
-    .realm-tab:hover {
-      color: var(--gow-gold-light);
-      border-color: var(--gow-crimson-bright);
-      box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
-    }
-
-    .realm-tab.active {
-      background: rgba(192, 21, 21, 0.3);
-      color: #ffffff;
-      border-color: var(--gow-crimson-bright);
-      box-shadow: 0 0 12px rgba(230, 57, 70, 0.6);
-    }
-
-    /* Realm Tab Icons */
-    .realm-tab-svg {
-      width: 13px;
-      height: 13px;
-      vertical-align: -2px;
-      margin-right: 6px;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .icon-all { color: var(--gow-gold-light); }
-    .icon-midgard { color: var(--gow-crimson-bright); }
-    .icon-alfheim { color: var(--gow-frost); }
-    .icon-niflheim { color: var(--gow-gold-light); }
-
-    .realm-tag {
-      display: inline-block;
-      font-size: 8.5px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      font-family: 'Cinzel', serif;
-      background: rgba(212, 175, 55, 0.15);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      color: var(--gow-gold-light);
-    }
-
-    .realm-tag.frost {
-      background: rgba(0, 240, 255, 0.12);
-      border-color: rgba(0, 240, 255, 0.4);
-      color: var(--gow-frost);
-    }
-
-    .realm-tag.crimson {
-      background: rgba(230, 57, 70, 0.2);
-      border-color: rgba(230, 57, 70, 0.5);
-      color: #ffffff;
-    }
-
-    .payload-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
-    .payload-card {
-      background: var(--gow-card-bg);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 12px;
-      padding: 12px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-
-    .payload-card:hover {
-      border-color: var(--gow-crimson-bright);
-      box-shadow: 0 0 16px rgba(230, 57, 70, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .payload-card.card-featured {
-      border-color: var(--gow-crimson-bright);
-      background: linear-gradient(135deg, rgba(35, 12, 16, 0.85) 0%, rgba(18, 22, 34, 0.9) 100%);
-      box-shadow: 0 0 14px rgba(230, 57, 70, 0.35);
-    }
-
-    .p-name {
-      font-weight: 800;
-      font-size: 13.5px;
-      color: var(--gow-gold-light);
-      font-family: 'Cinzel', serif;
-      letter-spacing: 1px;
-    }
-
-    .p-desc {
-      font-size: 10.5px;
-      color: #94a3b8;
-      margin-top: 3px;
-    }
-
-    .btn-send {
-      background: rgba(0, 240, 255, 0.12);
-      border: 1px solid var(--gow-frost);
-      color: var(--gow-frost);
-      border-radius: 8px;
-      padding: 7px 16px;
-      font-size: 11px;
-      font-family: 'Cinzel', serif;
-      font-weight: 800;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-    }
-
-    .btn-send:hover {
-      background: var(--gow-frost);
-      color: #07090f;
-      box-shadow: 0 0 14px var(--gow-frost);
-    }
-
-    .btn-featured {
-      background: rgba(192, 21, 21, 0.25);
-      border-color: var(--gow-crimson-bright);
-      color: #ffffff;
-    }
-
-    .btn-featured:hover {
-      background: var(--gow-crimson-bright);
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(230, 57, 70, 0.8);
-    }
-
-    .btn-send[data-state="sending"] {
-      border-color: var(--gow-gold);
-      color: var(--gow-gold);
-      background: rgba(212, 175, 55, 0.2);
-      pointer-events: none;
-    }
-
-    .btn-send[data-state="sent"] {
-      border-color: #00ffaa;
-      color: #00ffaa;
-      background: rgba(0, 255, 170, 0.2);
-      box-shadow: 0 0 12px rgba(0, 255, 170, 0.5);
-    }
-
-    /* Valkyrie Forge Custom Payload Box */
-    .custom-payload-box {
-      margin-top: 18px;
-      border: 2px dashed rgba(212, 175, 55, 0.45);
-      border-radius: 14px;
-      background: rgba(14, 18, 28, 0.75);
-      padding: 18px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
-    }
-    .custom-payload-box:hover, .custom-payload-box.drop-active {
-      border-color: var(--gow-gold);
-      background: rgba(30, 15, 20, 0.85);
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.35), inset 0 0 20px rgba(230, 57, 70, 0.2);
-      transform: translateY(-2px);
-    }
-    .custom-drop-icon {
-      font-size: 22px;
-      color: var(--gow-gold-light);
-      margin-bottom: 4px;
-    }
-    .custom-drop-title {
-      font-family: 'Cinzel', serif;
-      font-size: 13.5px;
-      font-weight: 800;
-      color: var(--gow-gold-light);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-    }
-    .custom-drop-subtitle {
-      font-size: 11px;
-      color: #94a3b8;
-      margin-top: 4px;
-      letter-spacing: 0.5px;
-    }
-    .drop-browse-link {
-      color: var(--gow-frost);
-      text-decoration: underline;
-      font-weight: bold;
-    }
-    .custom-drop-status {
-      font-size: 11px;
-      color: var(--gow-frost);
-      margin-top: 6px;
-      font-family: 'Consolas', monospace;
-      letter-spacing: 0.5px;
-    }
-
-    /* God of War Favor Success Notification Popup */
-    #jb-success-popup {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 99999;
-      max-width: 420px;
-      width: calc(100% - 48px);
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(20px) scale(0.95);
-      transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-
-    #jb-success-popup.jb-popup-show {
-      opacity: 1 !important;
-      transform: translateY(0) scale(1) !important;
-      pointer-events: auto !important;
-    }
-
-    .jb-popup-card {
-      position: relative;
-      display: flex !important;
-      align-items: center;
-      padding: 14px 18px;
-      background: #140d14 !important;
-      background: rgba(20, 13, 20, 0.98) !important;
-      border: 2px solid #d4af37 !important;
-      border-radius: 16px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.6) !important;
-      cursor: pointer;
-      box-sizing: border-box;
-      width: 100%;
-    }
-
-    .jb-popup-img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #d4af37;
-      box-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
-      flex-shrink: 0;
-      margin-right: 14px;
-    }
-
-    .jb-popup-content {
-      flex: 1 1 auto !important;
-      min-width: 0 !important;
-      display: block !important;
-      overflow: visible !important;
-    }
-
-    .jb-popup-badge {
-      display: block !important;
-      font-size: 10.5px !important;
-      font-weight: 800 !important;
-      letter-spacing: 1.5px !important;
-      color: #f5d77f !important;
-      text-transform: uppercase !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-      margin-bottom: 2px !important;
-      text-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
-    }
-
-    .jb-popup-title {
-      display: block !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-      font-size: 15px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.6px !important;
-      color: #ffffff !important;
-      line-height: 1.25 !important;
-      text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
-    }
-
-    .jb-popup-subtitle {
-      display: block !important;
-      font-size: 11.5px !important;
-      font-weight: 600 !important;
-      color: #00f0ff !important;
-      margin-top: 3px !important;
-      letter-spacing: 0.5px !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-      word-break: break-word !important;
-      text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
-    }
-
-    .jb-popup-close {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 22px;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0 4px;
-      line-height: 1;
-    }
-
-    .jb-popup-close:hover {
-      color: #ffffff;
-      text-shadow: 0 0 8px var(--gow-crimson-bright);
-    }
-
-    /* Credits Footer */
-    .credits-box {
-      margin-top: 22px;
-      padding: 14px 18px;
-      background: var(--gow-panel-bg);
-      border: 1px solid var(--gow-border-gold);
-      border-radius: 14px;
-      text-align: center;
-      font-size: 11.5px;
-      color: #94a3b8;
-      line-height: 1.6;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    .credits-title {
-      color: var(--gow-gold-light);
-      font-weight: 900;
-      letter-spacing: 2px;
-      margin: 0 0 6px 0;
-      font-size: 12px;
-      text-transform: uppercase;
-      font-family: 'Cinzel', serif;
-      text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    }
-  </style>
-</head>
-<body>
-  <!-- Jailbreak Success Popup Notification -->
-  <div id="jb-success-popup" role="alert" onclick="closeJbSuccessPopup()">
-    <div class="jb-popup-card">
-      <img src="./prestige.jpg" alt="Favor Completed" class="jb-popup-img">
-      <div class="jb-popup-content">
-        <span class="jb-popup-badge">&#9733; FAVOR COMPLETED &#9733;</span>
-        <span class="jb-popup-title">Jailbreak Success!</span>
-        <span class="jb-popup-subtitle">Kernel Conquered &bull; Midgard Secured</span>
-      </div>
-      <button type="button" class="jb-popup-close" onclick="event.stopPropagation(); closeJbSuccessPopup();" aria-label="Close">&times;</button>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="top-nav-hub">
-      <button type="button" id="glassToggleBtn" class="nav-hub-link glass-btn" title="Click to cycle background glass opacity: 25% Clear, 50% Balanced, 75% Deep, 95% Solid">&#9680; GLASS: 50%</button>
-      <a href="./" class="nav-hub-link">&larr; LONELY HUB</a>
-      <a href="https://gotay2423-sys.github.io/Lonely-host/ps5/" class="nav-hub-link nav-ps5">PS5 HOST (RELAPSE) &rarr;</a>
-    </div>
-
-    <!-- God of War Header Banner -->
-    <div class="gow-header-banner">
-      <div class="kratos-crest-wrap">
-        <div class="kratos-crest-frame">
-          <div class="kratos-runic-orbit"></div>
-          <div class="kratos-medallion">
-            <img src="./kratos_crest.png" alt="Kratos God of War">
-            <div class="kratos-medallion-glare"></div>
-          </div>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lonely 2 — PS4 Exploit Host (God of War Edition)</title>
+    <style>
+      /* ==========================================================================
+         BACKGROUND & PANEL OPACITY SETTINGS (EDIT HERE OR USE IN-APP GLASS BUTTON)
+         --bg-dim-opacity: 0.0 (crystal-clear art) to 0.85 (dark tint). Default: 0.28
+         --panel-opacity:  0.15 (high glass transparency) to 1.0 (solid). Default: 0.50
+         ========================================================================== */
+      :root {
+        --bg-dim-opacity: 0.28;
+        --panel-opacity: 0.50;
+
+        --gow-crimson: #c01515;
+        --gow-crimson-bright: #e63946;
+        --gow-crimson-dark: #6e0c0c;
+        --gow-gold: #d4af37;
+        --gow-gold-light: #f5d77f;
+        --gow-frost: #00f0ff;
+        --gow-frost-glow: rgba(0, 240, 255, 0.45);
+        --gow-ash: #e2e8f0;
+        --gow-slate-dark: #080a0f;
+        --gow-panel-bg: rgba(12, 16, 26, var(--panel-opacity));
+        --gow-card-bg: rgba(16, 22, 34, calc(var(--panel-opacity) + 0.08));
+        --gow-border-gold: rgba(212, 175, 55, 0.45);
+        --gow-border-crimson: rgba(192, 21, 21, 0.45);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 20px 16px;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(10, 13, 20, var(--bg-dim-opacity)) 0%, rgba(5, 7, 12, calc(var(--bg-dim-opacity) + 0.14)) 100%),
+          url('./gow_bg.jpg');
+        background-size: cover, cover;
+        background-position: center top;
+        background-attachment: fixed;
+        color: #e2e8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+        width: 100%;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 860px;
+        min-width: 0;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Top Navigation Hub */
+      .top-nav-hub {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+
+      .nav-hub-link {
+        background: rgba(18, 22, 34, 0.85);
+        border: 1px solid var(--gow-border-gold);
+        color: var(--gow-gold-light);
+        padding: 6px 16px;
+        border-radius: 18px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      .nav-hub-link:hover {
+        border-color: var(--gow-crimson-bright);
+        color: #ffffff;
+        box-shadow: 0 0 14px rgba(230, 57, 70, 0.6);
+      }
+
+      .glass-btn {
+        background: rgba(22, 28, 44, 0.85);
+        border-color: var(--gow-border-gold);
+        color: var(--gow-gold-light);
+        cursor: pointer;
+      }
+      .glass-btn:hover {
+        box-shadow: 0 0 14px rgba(212, 175, 55, 0.6);
+        color: #ffffff;
+      }
+
+      /* God of War Header Banner */
+      .gow-header-banner {
+        position: relative;
+        background: linear-gradient(180deg, rgba(20, 25, 40, var(--panel-opacity)) 0%, rgba(10, 13, 22, calc(var(--panel-opacity) + 0.08)) 100%);
+        border: 2px solid var(--gow-border-gold);
+        border-radius: 20px;
+        padding: 22px 20px 20px 20px;
+        margin-bottom: 20px;
+        text-align: center;
+        overflow: hidden;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(192, 21, 21, 0.2), inset 0 0 25px rgba(212, 175, 55, 0.08);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      /* Corner Nordic Knot Accents */
+      .gow-header-banner::before {
+        content: "ᛟ ᚱ ᛒ ᛁ ᛋ";
+        position: absolute;
+        top: 8px;
+        left: 14px;
+        font-size: 10px;
+        letter-spacing: 4px;
+        color: rgba(212, 175, 55, 0.4);
+        font-family: serif;
+      }
+      .gow-header-banner::after {
+        content: "ᛈ ᛋ ᛏ";
+        position: absolute;
+        top: 8px;
+        right: 14px;
+        font-size: 10px;
+        letter-spacing: 4px;
+        color: rgba(0, 240, 255, 0.4);
+        font-family: serif;
+      }
+
+      /* Kratos God of War Shield Crest */
+      .kratos-crest-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 14px;
+        position: relative;
+      }
+
+      .kratos-crest-frame {
+        position: relative;
+        width: 136px;
+        height: 136px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      @keyframes runic-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .kratos-runic-orbit {
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1.5px dashed rgba(212, 175, 55, 0.6);
+        box-shadow: 
+          0 0 25px rgba(230, 57, 70, 0.5), 
+          0 0 45px rgba(212, 175, 55, 0.3), 
+          inset 0 0 15px rgba(192, 21, 21, 0.25);
+        z-index: 1;
+        pointer-events: none;
+        animation: runic-spin 30s linear infinite;
+        will-change: transform;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+
+      .kratos-medallion {
+        position: relative;
+        width: 126px;
+        height: 126px;
+        border-radius: 50%;
+        border: 3.5px solid var(--gow-gold);
+        box-shadow: 
+          0 0 22px rgba(212, 175, 55, 0.85), 
+          0 0 45px rgba(230, 57, 70, 0.7), 
+          inset 0 0 16px rgba(0, 0, 0, 0.95);
+        overflow: hidden;
+        background: radial-gradient(circle, #2a221f 0%, #0d0f17 100%);
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .kratos-medallion img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: contrast(1.15) brightness(1.02) saturate(1.08);
+        transform: scale(1.02);
+      }
+
+      .kratos-medallion-glare {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: 
+          radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 65%, rgba(10, 13, 20, 0.75) 100%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 45%, rgba(230, 57, 70, 0.25) 100%);
+        pointer-events: none;
+        box-shadow: inset 0 0 14px rgba(212, 175, 55, 0.7), inset 0 0 22px rgba(0, 0, 0, 0.6);
+      }
+
+      .gow-title {
+        font-size: 48px;
+        font-weight: 900;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        margin: 0;
+        background: linear-gradient(180deg, #ffffff 0%, #f5d77f 35%, #d4af37 70%, #9e791b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 18px rgba(212, 175, 55, 0.7)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95));
+        line-height: 1.1;
+      }
+
+      .gow-subtitle {
+        font-size: 13.5px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: var(--gow-crimson-bright);
+        text-shadow: 0 0 10px rgba(230, 57, 70, 0.65), 0 0 20px rgba(192, 21, 21, 0.4);
+        margin-top: 6px;
+        text-transform: uppercase;
+      }
+
+      .gow-tagline {
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-top: 6px;
+        text-transform: uppercase;
+      }
+
+      /* Status Badges */
+      .status-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        background: rgba(18, 22, 34, 0.9);
+        border: 1px solid var(--gow-border-gold);
+        padding: 7px 18px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(212, 175, 55, 0.08);
+        color: var(--gow-gold-light);
+      }
+
+      .badge-fw {
+        color: var(--gow-frost);
+        border-color: rgba(0, 240, 255, 0.5);
+      }
+
+      .badge-elfldr {
+        color: var(--gow-gold);
+        border-color: rgba(255, 208, 0, 0.5);
+      }
+
+      /* Terminal Chrome Bar */
+      .terminal-bar {
+        background: rgba(18, 22, 34, calc(var(--panel-opacity) + 0.15));
+        border: 1px solid var(--gow-border-gold);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+        padding: 10px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11.5px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .terminal-dots { display: flex; gap: 8px; }
+      .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+      .dot-red { background: var(--gow-crimson-bright); box-shadow: 0 0 6px var(--gow-crimson-bright); }
+      .dot-yellow { background: var(--gow-gold); box-shadow: 0 0 6px var(--gow-gold); }
+      .dot-green { background: var(--gow-frost); box-shadow: 0 0 6px var(--gow-frost); }
+
+      .terminal-title {
+        color: var(--gow-gold-light);
+        letter-spacing: 1.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 11.5px;
+      }
+
+      .terminal-port {
+        color: var(--gow-frost);
+        opacity: 0.95;
+        font-size: 11px;
+        letter-spacing: 1px;
+        font-weight: 800;
+      }
+
+      /* Console pre */
+      #console {
+        width: 100%;
+        height: 250px;
+        margin: 0;
+        padding: 16px 18px;
+        font-size: 12.5px;
+        line-height: 1.6;
+        overflow-y: auto;
+        overflow-x: hidden;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+        font-family: 'Consolas', 'Courier New', monospace;
+        background: var(--gow-panel-bg);
+        border: 1px solid var(--gow-border-gold);
+        border-top: none;
+        border-bottom-left-radius: 14px;
+        border-bottom-right-radius: 14px;
+        color: var(--gow-frost);
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-sizing: border-box;
+      }
+
+      #console::-webkit-scrollbar, .payload-grid::-webkit-scrollbar { width: 7px; }
+      #console::-webkit-scrollbar-track, .payload-grid::-webkit-scrollbar-track {
+        background: rgba(10, 13, 20, 0.6);
+        border-radius: 4px;
+      }
+      #console::-webkit-scrollbar-thumb, .payload-grid::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--gow-gold), var(--gow-crimson));
+        border-radius: 4px;
+        box-shadow: 0 0 8px var(--gow-crimson);
+      }
+
+      /* Armory Payloads Section */
+      .payload-section {
+        margin-top: 22px;
+        background: var(--gow-panel-bg);
+        border: 1px solid var(--gow-border-gold);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.06);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .payload-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--gow-border-gold);
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .payload-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--gow-gold-light);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+
+      .payload-subtitle {
+        font-size: 11px;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+      }
+
+      /* Live Search Input */
+      .payload-search-bar {
+        margin-bottom: 14px;
+        display: flex;
+      }
+      .payload-search-input {
+        width: 100%;
+        background: rgba(14, 18, 28, 0.85);
+        border: 1px solid var(--gow-border-gold);
+        border-radius: 8px;
+        padding: 9px 14px;
+        color: var(--gow-gold-light);
+        font-size: 12px;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.2s ease;
+      }
+      .payload-search-input:focus {
+        border-color: var(--gow-crimson-bright);
+        box-shadow: 0 0 12px rgba(230, 57, 70, 0.4);
+      }
+      .payload-search-input::placeholder {
+        color: #64748b;
+      }
+
+      /* Realm Tabs */
+      .realm-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .realm-tab {
+        background: rgba(18, 22, 34, 0.7);
+        border: 1px solid var(--gow-border-gold);
+        color: #94a3b8;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+      }
+
+      .realm-tab:hover {
+        color: var(--gow-gold-light);
+        border-color: var(--gow-crimson-bright);
+        box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+      }
+
+      .realm-tab.active {
+        background: rgba(192, 21, 21, 0.3);
+        color: #ffffff;
+        border-color: var(--gow-crimson-bright);
+        box-shadow: 0 0 12px rgba(230, 57, 70, 0.6);
+      }
+
+      /* Realm Tab Icons */
+      .realm-tab-svg {
+        width: 13px;
+        height: 13px;
+        vertical-align: -2px;
+        margin-right: 6px;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+      .icon-all { color: var(--gow-gold-light); }
+      .icon-midgard { color: var(--gow-crimson-bright); }
+      .icon-alfheim { color: var(--gow-frost); }
+      .icon-niflheim { color: var(--gow-gold-light); }
+
+      .realm-tag {
+        display: inline-block;
+        font-size: 8.5px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        background: rgba(212, 175, 55, 0.15);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        color: var(--gow-gold-light);
+      }
+
+      .realm-tag.frost {
+        background: rgba(0, 240, 255, 0.12);
+        border-color: rgba(0, 240, 255, 0.4);
+        color: var(--gow-frost);
+      }
+
+      .realm-tag.crimson {
+        background: rgba(230, 57, 70, 0.2);
+        border-color: rgba(230, 57, 70, 0.5);
+        color: #ffffff;
+      }
+
+      .payload-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+      }
+
+      .payload-card {
+        background: var(--gow-card-bg);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 12px;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+
+      .payload-card:hover {
+        border-color: var(--gow-crimson-bright);
+        box-shadow: 0 0 16px rgba(230, 57, 70, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .payload-card.card-featured {
+        border-color: var(--gow-crimson-bright);
+        background: linear-gradient(135deg, rgba(35, 12, 16, 0.85) 0%, rgba(18, 22, 34, 0.9) 100%);
+        box-shadow: 0 0 14px rgba(230, 57, 70, 0.35);
+      }
+
+      .p-name {
+        font-weight: 800;
+        font-size: 13.5px;
+        color: var(--gow-gold-light);
+        letter-spacing: 1px;
+      }
+
+      .p-desc {
+        font-size: 10.5px;
+        color: #94a3b8;
+        margin-top: 3px;
+      }
+
+      .btn-send {
+        background: rgba(0, 240, 255, 0.12);
+        border: 1px solid var(--gow-frost);
+        color: var(--gow-frost);
+        border-radius: 8px;
+        padding: 7px 16px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .btn-send:hover {
+        background: var(--gow-frost);
+        color: #07090f;
+        box-shadow: 0 0 14px var(--gow-frost);
+      }
+
+      .btn-featured {
+        background: rgba(192, 21, 21, 0.25);
+        border-color: var(--gow-crimson-bright);
+        color: #ffffff;
+      }
+
+      .btn-featured:hover {
+        background: var(--gow-crimson-bright);
+        color: #ffffff;
+        box-shadow: 0 0 16px rgba(230, 57, 70, 0.8);
+      }
+
+      /* Valkyrie Forge Custom Payload Box */
+      .custom-payload-box {
+        margin-top: 18px;
+        border: 2px dashed rgba(212, 175, 55, 0.45);
+        border-radius: 14px;
+        background: rgba(14, 18, 28, 0.75);
+        padding: 18px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+      }
+      .custom-payload-box:hover, .custom-payload-box.drop-active {
+        border-color: var(--gow-gold);
+        background: rgba(30, 15, 20, 0.85);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.35), inset 0 0 20px rgba(230, 57, 70, 0.2);
+        transform: translateY(-2px);
+      }
+      .custom-drop-icon {
+        font-size: 22px;
+        color: var(--gow-gold-light);
+        margin-bottom: 4px;
+      }
+      .custom-drop-title {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: var(--gow-gold-light);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+      }
+      .custom-drop-subtitle {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 4px;
+        letter-spacing: 0.5px;
+      }
+      .drop-browse-link {
+        color: var(--gow-frost);
+        text-decoration: underline;
+        font-weight: bold;
+      }
+      .custom-drop-status {
+        font-size: 11px;
+        color: var(--gow-frost);
+        margin-top: 6px;
+        font-family: 'Consolas', monospace;
+        letter-spacing: 0.5px;
+      }
+
+      /* God of War Favor Success Notification Popup */
+      #jb-success-popup {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 99999;
+        max-width: 420px;
+        width: calc(100% - 48px);
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+
+      #jb-success-popup.jb-popup-show {
+        opacity: 1 !important;
+        transform: translateY(0) scale(1) !important;
+        pointer-events: auto !important;
+      }
+
+      .jb-popup-card {
+        position: relative;
+        display: flex !important;
+        align-items: center;
+        padding: 14px 18px;
+        background: #140d14 !important;
+        background: rgba(20, 13, 20, 0.98) !important;
+        border: 2px solid #d4af37 !important;
+        border-radius: 16px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.6) !important;
+        cursor: pointer;
+        box-sizing: border-box;
+        width: 100%;
+      }
+
+      .jb-popup-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #d4af37;
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
+        flex-shrink: 0;
+        margin-right: 14px;
+      }
+
+      .jb-popup-content {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+
+      .jb-popup-badge {
+        display: block !important;
+        font-size: 10.5px !important;
+        font-weight: 800 !important;
+        letter-spacing: 1.5px !important;
+        color: #f5d77f !important;
+        text-transform: uppercase !important;
+        margin-bottom: 2px !important;
+        text-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
+      }
+
+      .jb-popup-title {
+        display: block !important;
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.6px !important;
+        color: #ffffff !important;
+        line-height: 1.25 !important;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+      }
+
+      .jb-popup-subtitle {
+        display: block !important;
+        font-size: 11.5px !important;
+        font-weight: 600 !important;
+        color: #00f0ff !important;
+        margin-top: 3px !important;
+        letter-spacing: 0.5px !important;
+        word-break: break-word !important;
+        text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+      }
+
+      .jb-popup-close {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 0 4px;
+        line-height: 1;
+      }
+
+      .jb-popup-close:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px var(--gow-crimson-bright);
+      }
+
+      /* Credits Footer */
+      .credits-box {
+        margin-top: 22px;
+        padding: 14px 18px;
+        background: var(--gow-panel-bg);
+        border: 1px solid var(--gow-border-gold);
+        border-radius: 14px;
+        text-align: center;
+        font-size: 11.5px;
+        color: #94a3b8;
+        line-height: 1.6;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .credits-title {
+        color: var(--gow-gold-light);
+        font-weight: 900;
+        letter-spacing: 2px;
+        margin: 0 0 6px 0;
+        font-size: 12px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      }
+    </style>
+    <script src="src/main.js" defer></script>
+  </head>
+  <body>
+    <!-- Favor Completed Success Notification Popup -->
+    <div id="jb-success-popup" role="alert" onclick="closeJbSuccessPopup()">
+      <div class="jb-popup-card">
+        <img src="./prestige.jpg" alt="Favor Completed" class="jb-popup-img">
+        <div class="jb-popup-content">
+          <span class="jb-popup-badge">&#9733; FAVOR COMPLETED &#9733;</span>
+          <span class="jb-popup-title">Jailbreak Success!</span>
+          <span class="jb-popup-subtitle">Kernel Conquered &bull; Midgard Secured</span>
         </div>
-      </div>
-
-      <h1 class="gow-title">LONELY 2</h1>
-      <div class="gow-subtitle">&#9876; GOD OF WAR EDITION &#9876;</div>
-      <p class="gow-tagline">PS4 EXPLOIT SUITE &bull; FW 9.00 &ndash; 12.02+ &bull; CLEAN LOADER</p>
-    </div>
-
-    <!-- Status Chips -->
-    <div class="status-container">
-      <div class="chip fw-chip" id="fwChip" title="Click to view/override target firmware" style="cursor: pointer;">&#9876; <span id="fwText">FW 9.00 – 12.02+</span></div>
-      <div class="chip status-chip" id="statusChip">
-        <span class="led" id="statusLed"></span>
-        <span id="statusText">EXPLOIT: READY</span>
-      </div>
-      <div class="chip elfldr-chip" id="elfldrChip">
-        <span class="led led-yellow" id="elfldrLed"></span>
-        <span id="elfldrText">ELFLDR :9021 (WAITING)</span>
-      </div>
-      <div class="chip cache-chip" id="cacheChip" title="Offline Cache Status" style="cursor: pointer;">
-        <span class="led" id="cacheLed"></span>
-        <span id="cacheText">CACHE OFFLINE</span>
-      </div>
-      <button type="button" class="chip reset-chip" id="resetCacheBtn" title="Reset offline cache and reload fresh">
-        <span class="led led-red" id="resetCacheLed"></span>
-        <span id="resetCacheText">RESET CACHE</span>
-      </button>
-    </div>
-
-    <!-- Action Run Button -->
-    <div class="controls">
-      <button id="runBtn" tabindex="0">&#9876; RUN EXPLOIT &#9876;</button>
-      <div class="auto-run-bar">
-        <label class="toggle-wrap" title="Automatically run exploit on page load">
-          <input type="checkbox" id="autoJbToggle">
-          <span class="toggle-slider"></span>
-          <span class="toggle-text">AUTO-RUN ON LOAD</span>
-        </label>
+        <button type="button" class="jb-popup-close" onclick="event.stopPropagation(); closeJbSuccessPopup();" aria-label="Close">&times;</button>
       </div>
     </div>
 
-    <!-- Terminal Window -->
-    <div class="terminal-bar">
-      <div class="terminal-dots">
-        <span class="dot dot-red"></span>
-        <span class="dot dot-yellow"></span>
-        <span class="dot dot-green"></span>
+    <div class="container">
+      <div class="top-nav-hub">
+        <button type="button" id="glassToggleBtn" class="nav-hub-link glass-btn" title="Click to cycle background glass opacity: 25% Clear, 50% Balanced, 75% Deep, 95% Solid">&#9680; GLASS: 50%</button>
+        <a href="./" class="nav-hub-link">&larr; LONELY HUB</a>
       </div>
-      <div class="terminal-title">KRATOS @ MIDGARD // PS4 KERNEL DISPATCH</div>
-      <div class="terminal-port">PORT: 9021</div>
+
+      <!-- God of War Header Banner -->
+      <div class="gow-header-banner">
+        <div class="kratos-crest-wrap">
+          <div class="kratos-crest-frame">
+            <div class="kratos-runic-orbit"></div>
+            <div class="kratos-medallion">
+              <img src="./kratos_crest.png" alt="Kratos God of War">
+              <div class="kratos-medallion-glare"></div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="gow-title">LONELY 2</h1>
+        <div class="gow-subtitle">&#9876; GOD OF WAR EDITION &#9876;</div>
+        <p class="gow-tagline">PS4 EXPLOIT SUITE &bull; FW 9.00 &ndash; 12.02+ &bull; CLEAN LOADER</p>
+      </div>
+
+      <!-- Status Badges -->
+      <div class="status-row">
+        <div class="badge badge-fw" id="fwBadge">FW 9.00 &ndash; 12.02+</div>
+        <div class="badge" id="hostStatus">EXPLOIT: INITIALIZING...</div>
+        <div class="badge badge-elfldr" id="elfldrStatus">ELFLDR: WAITING</div>
+      </div>
+
+      <!-- Terminal Chrome Bar -->
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="terminal-title">KRATOS @ MIDGARD // PS4 KERNEL DISPATCH</div>
+        <div class="terminal-port">PORT: 9021</div>
+      </div>
+
+      <pre id="console"></pre>
+
+      <!-- Armory of the Nine Realms Section -->
+      <div class="payload-section" id="payloadSection">
+        <div class="payload-header">
+          <span class="payload-title">&#9876; Armory of the Nine Realms</span>
+          <span class="payload-subtitle">ELFLDR on port 9021 &middot; Clean Mode &amp; Payload Dispatch</span>
+        </div>
+
+        <!-- Live Search Bar -->
+        <div class="payload-search-bar">
+          <input type="text" id="payloadSearchInput" placeholder="Search Armory of the Nine Realms (GoldHEN, FTP, Dumper, Netcat)..." class="payload-search-input">
+        </div>
+
+        <!-- Realm Filter Tabs -->
+        <div class="realm-tabs" id="realmTabs">
+          <button type="button" class="realm-tab active" data-filter="all">
+            <svg class="realm-tab-svg icon-all" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.5 2.5L13 4l4 4 1.5-1.5c.6-.6.6-1.5 0-2.1l-1.9-1.9c-.6-.6-1.5-.6-2.1 0zm-3 3L3.5 13.5l1 1L12 7l-1.5-1.5zm6 6L9.5 19.5l1 1 8-8-1-1zM2.5 19.5l2 2 3-3-2-2-3 3z"/>
+            </svg>
+            All Realms
+          </button>
+          <button type="button" class="realm-tab" data-filter="midgard">
+            <svg class="realm-tab-svg icon-midgard" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.54-3.07 8.79-7 9.94-3.93-1.15-7-5.4-7-9.94V6.3l7-3.12z"/>
+            </svg>
+            Midgard (System)
+          </button>
+          <button type="button" class="realm-tab" data-filter="alfheim">
+            <svg class="realm-tab-svg icon-alfheim" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            Alfheim (Network)
+          </button>
+          <button type="button" class="realm-tab" data-filter="niflheim">
+            <svg class="realm-tab-svg icon-niflheim" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 11h-4.17l3.24-3.24-1.41-1.42L15 11h-2V9l4.66-4.66-1.42-1.41L13 6.17V2h-2v4.17L7.76 2.93 6.34 4.34 11 9v2H9L4.34 6.34 2.93 7.76 6.17 11H2v2h4.17l-3.24 3.24 1.41 1.42L9 13h2v2l-4.66 4.66 1.42 1.41L11 17.83V22h2v-4.17l3.24 3.24 1.42-1.41L13 15v-2h2l4.66 4.66 1.41-1.42L17.83 13H22v-2z"/>
+            </svg>
+            Niflheim (Debug)
+          </button>
+        </div>
+
+        <!-- Payload Grid -->
+        <div class="payload-grid" id="payloadGrid">
+          <div class="payload-card card-featured" data-realm="midgard">
+            <div class="p-info">
+              <span class="realm-tag crimson">Midgard &bull; System</span>
+              <div class="p-name">Clean Boot Mode</div>
+              <div class="p-desc">ELFLDR daemon listening on port 9021 without injecting payloads</div>
+            </div>
+            <button class="btn-send btn-featured" data-action="clean">ACTIVE</button>
+          </div>
+
+          <div class="payload-card" data-realm="midgard">
+            <div class="p-info">
+              <span class="realm-tag crimson">Midgard &bull; System</span>
+              <div class="p-name">GoldHEN</div>
+              <div class="p-desc">Homebrew Enabler, Debug Settings &amp; Plugin Loader</div>
+            </div>
+            <button class="btn-send" data-payload="goldhen.bin">SEND</button>
+          </div>
+
+          <div class="payload-card" data-realm="midgard">
+            <div class="p-info">
+              <span class="realm-tag crimson">Midgard &bull; System</span>
+              <div class="p-name">App2USB &amp; Backup</div>
+              <div class="p-desc">Move installed games and save data to external USB storage</div>
+            </div>
+            <button class="btn-send" data-payload="app2usb.bin">SEND</button>
+          </div>
+
+          <div class="payload-card" data-realm="alfheim">
+            <div class="p-info">
+              <span class="realm-tag frost">Alfheim &bull; Network</span>
+              <div class="p-name">Remote Netcat Loader</div>
+              <div class="p-desc">Send payloads from PC via <code>nc &lt;PS4_IP&gt; 9021 &lt; payload.bin</code></div>
+            </div>
+            <button class="btn-send" data-action="netcat">INFO</button>
+          </div>
+
+          <div class="payload-card" data-realm="alfheim">
+            <div class="p-info">
+              <span class="realm-tag frost">Alfheim &bull; Network</span>
+              <div class="p-name">FTP Server</div>
+              <div class="p-desc">High-speed FTP server daemon for full filesystem access (Port 2121 / 1337)</div>
+            </div>
+            <button class="btn-send" data-payload="ftp.bin">SEND</button>
+          </div>
+
+          <div class="payload-card" data-realm="alfheim">
+            <div class="p-info">
+              <span class="realm-tag frost">Alfheim &bull; Network</span>
+              <div class="p-name">WebSrv File Manager</div>
+              <div class="p-desc">Web-based local file manager and payload dispatcher</div>
+            </div>
+            <button class="btn-send" data-payload="websrv.bin">SEND</button>
+          </div>
+
+          <div class="payload-card" data-realm="niflheim">
+            <div class="p-info">
+              <span class="realm-tag">Niflheim &bull; Debug</span>
+              <div class="p-name">Kernel Logger</div>
+              <div class="p-desc">Stream live kernel and system exploit logs to console</div>
+            </div>
+            <button class="btn-send" data-action="klog">STREAM</button>
+          </div>
+
+          <div class="payload-card" data-realm="niflheim">
+            <div class="p-info">
+              <span class="realm-tag">Niflheim &bull; Debug</span>
+              <div class="p-name">Disable Updates</div>
+              <div class="p-desc">Creates update block markers to prevent accidental firmware updates</div>
+            </div>
+            <button class="btn-send" data-payload="disable_updates.bin">SEND</button>
+          </div>
+
+          <div class="payload-card" data-realm="niflheim">
+            <div class="p-info">
+              <span class="realm-tag">Niflheim &bull; Debug</span>
+              <div class="p-name">Reboot / Standby</div>
+              <div class="p-desc">Safely reboot the PlayStation 4 or enter standby mode</div>
+            </div>
+            <button class="btn-send" data-payload="reboot.bin">SEND</button>
+          </div>
+        </div>
+
+        <!-- Valkyrie Forge: Custom Payload Loader -->
+        <div class="custom-payload-box" id="customDropZone" title="Click or drop a payload to send directly to port 9021">
+          <input type="file" id="customFileInput" accept=".elf,.bin" style="display:none;">
+          <div class="custom-drop-icon">&#9876;</div>
+          <div class="custom-drop-title">VALKYRIE FORGE &bull; CUSTOM PAYLOAD LOADER</div>
+          <div class="custom-drop-subtitle">Drag &amp; drop any <b>.bin</b> or <b>.elf</b> file here, or <span class="drop-browse-link">Browse from Device</span></div>
+          <div class="custom-drop-status" id="customDropStatus">Ready to dispatch to 127.0.0.1:9021</div>
+        </div>
+      </div>
+
+      <!-- Credits Footer -->
+      <div class="credits-box">
+        <div class="credits-title">LONELY 2 PS4 EXPLOIT SUITE &middot; GOD OF WAR EDITION</div>
+        <p style="margin: 0 0 6px 0;">Based on <b>lonely2-host</b> &amp; <b>wobkot / lapse</b> core exploit research.</p>
+        <p style="margin: 0; opacity: 0.85;">
+          <b>Kernel &amp; WebKit Research:</b> TheFlow, Dr. Yenyen, ufm42, Jordy, Sleirsgoevy, Flatz, Specter, EchoStretch, cow, nhk, bollarz, EarthOnion.<br>
+          <b>Payloads:</b> SiSTRo (GoldHEN), John T&ouml;rnblom (elfldr), Al Azif, Scene Collective.
+        </p>
+      </div>
     </div>
 
-    <div id="console"></div>
+    <script>
+      // Global hook when elfldr starts successfully
+      window.onElfldrReady = function() {
+        var hostStatus = document.getElementById('hostStatus');
+        if (hostStatus) {
+          hostStatus.textContent = 'EXPLOIT: READY (CLEAN)';
+          hostStatus.style.color = '#00ffaa';
+          hostStatus.style.borderColor = '#00ffaa';
+        }
+        var elfldrStatus = document.getElementById('elfldrStatus');
+        if (elfldrStatus) {
+          elfldrStatus.textContent = 'ELFLDR: LISTENING (:9021)';
+          elfldrStatus.style.color = '#00f3ff';
+          elfldrStatus.style.borderColor = '#00f3ff';
+        }
+        showJbSuccessPopup("Kernel Conquered &bull; Midgard Secured");
+      };
 
-    <!-- Armory of the Nine Realms Section -->
-    <div class="payload-section" id="payloadSection">
-      <div class="payload-header">
-        <span class="payload-title">&#9876; Armory of the Nine Realms</span>
-        <span class="payload-subtitle">ELFLDR on port 9021 &middot; Clean Mode &amp; Payload Dispatch</span>
-      </div>
+      // Update FW badge if console is detected
+      window.addEventListener('DOMContentLoaded', function() {
+        try {
+          var ua = navigator.userAgent;
+          var match = /PlayStation\s+(\d+)[/ ](\d+)\.(\d+)/.exec(ua);
+          if (match) {
+            var con = match[1];
+            var maj = match[2];
+            var min = parseInt(match[3], 16).toString(16).padStart(2, '0');
+            var fwEl = document.getElementById('fwBadge');
+            if (fwEl) {
+              fwEl.textContent = 'PS' + con + ' FW ' + maj + '.' + min + ' (SUPPORTED)';
+              fwEl.style.color = '#00ffaa';
+              fwEl.style.borderColor = '#00ffaa';
+            }
+          }
+        } catch(e) {}
+      });
 
-      <!-- Live Search Bar -->
-      <div class="payload-search-bar">
-        <input type="text" id="payloadSearchInput" placeholder="Search Armory of the Nine Realms (GoldHEN, FTP, Dumper, Netcat)..." class="payload-search-input">
-      </div>
+      // God of War Favor Success Notification Popup
+      function showJbSuccessPopup(subtitle) {
+        var popup = document.getElementById("jb-success-popup");
+        if (!popup) return;
+        if (subtitle) {
+          var subEl = popup.querySelector(".jb-popup-subtitle");
+          if (subEl) subEl.innerHTML = subtitle;
+        }
+        popup.classList.add("jb-popup-show");
 
-      <!-- Realm Filter Tabs -->
-      <div class="realm-tabs" id="realmTabs">
-        <button type="button" class="realm-tab active" data-filter="all">
-          <svg class="realm-tab-svg icon-all" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14.5 2.5L13 4l4 4 1.5-1.5c.6-.6.6-1.5 0-2.1l-1.9-1.9c-.6-.6-1.5-.6-2.1 0zm-3 3L3.5 13.5l1 1L12 7l-1.5-1.5zm6 6L9.5 19.5l1 1 8-8-1-1zM2.5 19.5l2 2 3-3-2-2-3 3z"/>
-          </svg>
-          All Realms
-        </button>
-        <button type="button" class="realm-tab" data-filter="midgard">
-          <svg class="realm-tab-svg icon-midgard" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.54-3.07 8.79-7 9.94-3.93-1.15-7-5.4-7-9.94V6.3l7-3.12z"/>
-          </svg>
-          Midgard (System)
-        </button>
-        <button type="button" class="realm-tab" data-filter="alfheim">
-          <svg class="realm-tab-svg icon-alfheim" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-          </svg>
-          Alfheim (Network)
-        </button>
-        <button type="button" class="realm-tab" data-filter="niflheim">
-          <svg class="realm-tab-svg icon-niflheim" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M22 11h-4.17l3.24-3.24-1.41-1.42L15 11h-2V9l4.66-4.66-1.42-1.41L13 6.17V2h-2v4.17L7.76 2.93 6.34 4.34 11 9v2H9L4.34 6.34 2.93 7.76 6.17 11H2v2h4.17l-3.24 3.24 1.41 1.42L9 13h2v2l-4.66 4.66 1.42 1.41L11 17.83V22h2v-4.17l3.24 3.24 1.42-1.41L13 15v-2h2l4.66 4.66 1.41-1.42L17.83 13H22v-2z"/>
-          </svg>
-          Niflheim (Debug)
-        </button>
-      </div>
+        if (window._jbPopupTimer) clearTimeout(window._jbPopupTimer);
+        window._jbPopupTimer = setTimeout(function() {
+          closeJbSuccessPopup();
+        }, 7000);
+      }
 
-      <!-- Payload Grid -->
-      <div class="payload-grid" id="payloadGrid">
-        <div class="payload-card card-featured" data-realm="midgard">
-          <div class="p-info">
-            <span class="realm-tag crimson">Midgard &bull; System</span>
-            <div class="p-name">Clean Boot Mode</div>
-            <div class="p-desc">ELFLDR daemon listening on port 9021 without injecting payloads</div>
-          </div>
-          <button class="btn-send btn-featured" data-action="clean">ACTIVE</button>
-        </div>
+      function closeJbSuccessPopup() {
+        var popup = document.getElementById("jb-success-popup");
+        if (popup) {
+          popup.classList.remove("jb-popup-show");
+        }
+      }
+      window.showJbSuccessPopup = showJbSuccessPopup;
+      window.closeJbSuccessPopup = closeJbSuccessPopup;
 
-        <div class="payload-card" data-realm="midgard">
-          <div class="p-info">
-            <span class="realm-tag crimson">Midgard &bull; System</span>
-            <div class="p-name">GoldHEN</div>
-            <div class="p-desc">Homebrew Enabler, Debug Settings &amp; Plugin Loader</div>
-          </div>
-          <button class="btn-send" data-payload="goldhen.bin">SEND</button>
-        </div>
+      // Glass Opacity Manager (Presets: 25%, 50%, 75%, 95%)
+      (function() {
+        var glassToggleBtn = document.getElementById("glassToggleBtn");
+        var presets = [
+          { label: "25% (CLEAR)", panel: "0.25", bgDim: "0.15" },
+          { label: "50% (BALANCED)", panel: "0.50", bgDim: "0.28" },
+          { label: "75% (DEEP)", panel: "0.75", bgDim: "0.45" },
+          { label: "95% (SOLID)", panel: "0.95", bgDim: "0.75" }
+        ];
+        var curIdx = 1;
 
-        <div class="payload-card" data-realm="midgard">
-          <div class="p-info">
-            <span class="realm-tag crimson">Midgard &bull; System</span>
-            <div class="p-name">App2USB &amp; Backup</div>
-            <div class="p-desc">Move installed games and save data to external USB storage</div>
-          </div>
-          <button class="btn-send" data-payload="app2usb.bin">SEND</button>
-        </div>
+        function applyPreset(idx, save) {
+          curIdx = (idx + presets.length) % presets.length;
+          var p = presets[curIdx];
+          document.documentElement.style.setProperty("--panel-opacity", p.panel);
+          document.documentElement.style.setProperty("--bg-dim-opacity", p.bgDim);
+          if (glassToggleBtn) {
+            glassToggleBtn.textContent = "\u25D0 GLASS: " + p.label;
+          }
+          if (save) {
+            try { localStorage.setItem("lonely_panel_opacity_idx", String(curIdx)); } catch(e) {}
+          }
+        }
 
-        <div class="payload-card" data-realm="alfheim">
-          <div class="p-info">
-            <span class="realm-tag frost">Alfheim &bull; Network</span>
-            <div class="p-name">Remote Netcat Loader</div>
-            <div class="p-desc">Send payloads from PC via <code>nc &lt;PS4_IP&gt; 9021 &lt; payload.bin</code></div>
-          </div>
-          <button class="btn-send" data-action="netcat">INFO</button>
-        </div>
+        try {
+          var saved = localStorage.getItem("lonely_panel_opacity_idx");
+          if (saved !== null && !isNaN(parseInt(saved, 10))) {
+            applyPreset(parseInt(saved, 10), false);
+          }
+        } catch(e) {}
 
-        <div class="payload-card" data-realm="alfheim">
-          <div class="p-info">
-            <span class="realm-tag frost">Alfheim &bull; Network</span>
-            <div class="p-name">FTP Server</div>
-            <div class="p-desc">High-speed FTP server daemon for full filesystem access (Port 2121 / 1337)</div>
-          </div>
-          <button class="btn-send" data-payload="ftp.bin">SEND</button>
-        </div>
+        if (glassToggleBtn) {
+          glassToggleBtn.addEventListener("click", function() {
+            applyPreset(curIdx + 1, true);
+          });
+        }
+      })();
 
-        <div class="payload-card" data-realm="alfheim">
-          <div class="p-info">
-            <span class="realm-tag frost">Alfheim &bull; Network</span>
-            <div class="p-name">WebSrv File Manager</div>
-            <div class="p-desc">Web-based local file manager and payload dispatcher</div>
-          </div>
-          <button class="btn-send" data-payload="websrv.bin">SEND</button>
-        </div>
+      // Armory Tab and Search Filter
+      (function() {
+        var tabs = document.querySelectorAll("#realmTabs .realm-tab");
+        var cards = document.querySelectorAll("#payloadGrid .payload-card");
+        var searchInput = document.getElementById("payloadSearchInput");
+        var currentFilter = "all";
+        var searchQuery = "";
 
-        <div class="payload-card" data-realm="niflheim">
-          <div class="p-info">
-            <span class="realm-tag">Niflheim &bull; Debug</span>
-            <div class="p-name">Kernel Logger</div>
-            <div class="p-desc">Stream live kernel and system exploit logs to console</div>
-          </div>
-          <button class="btn-send" data-action="klog">STREAM</button>
-        </div>
+        function updateGrid() {
+          cards.forEach(function(card) {
+            var realm = card.getAttribute("data-realm");
+            var text = card.textContent.toLowerCase();
+            var matchesRealm = currentFilter === "all" || realm === currentFilter;
+            var matchesSearch = !searchQuery || text.indexOf(searchQuery) !== -1;
+            card.style.display = (matchesRealm && matchesSearch) ? "flex" : "none";
+          });
+        }
 
-        <div class="payload-card" data-realm="niflheim">
-          <div class="p-info">
-            <span class="realm-tag">Niflheim &bull; Debug</span>
-            <div class="p-name">Disable Updates</div>
-            <div class="p-desc">Creates update block markers to prevent accidental firmware updates</div>
-          </div>
-          <button class="btn-send" data-payload="disable_updates.bin">SEND</button>
-        </div>
+        tabs.forEach(function(tab) {
+          tab.addEventListener("click", function() {
+            tabs.forEach(function(t) { t.classList.remove("active"); });
+            tab.classList.add("active");
+            currentFilter = tab.getAttribute("data-filter") || "all";
+            updateGrid();
+          });
+        });
 
-        <div class="payload-card" data-realm="niflheim">
-          <div class="p-info">
-            <span class="realm-tag">Niflheim &bull; Debug</span>
-            <div class="p-name">Reboot / Standby</div>
-            <div class="p-desc">Safely reboot the PlayStation 4 or enter standby mode</div>
-          </div>
-          <button class="btn-send" data-payload="reboot.bin">SEND</button>
-        </div>
-      </div>
+        if (searchInput) {
+          searchInput.addEventListener("input", function(e) {
+            searchQuery = e.target.value.trim().toLowerCase();
+            updateGrid();
+          });
+        }
+      })();
 
-      <!-- Valkyrie Forge: Custom Payload Loader -->
-      <div class="custom-payload-box" id="customDropZone" title="Click or drop a payload to send directly to port 9021">
-        <input type="file" id="customFileInput" accept=".elf,.bin" style="display:none;">
-        <div class="custom-drop-icon">&#9876;</div>
-        <div class="custom-drop-title">VALKYRIE FORGE &bull; CUSTOM PAYLOAD LOADER</div>
-        <div class="custom-drop-subtitle">Drag &amp; drop any <b>.bin</b> or <b>.elf</b> file here, or <span class="drop-browse-link">Browse from Device</span></div>
-        <div class="custom-drop-status" id="customDropStatus">Ready to dispatch to 127.0.0.1:9021</div>
-      </div>
-    </div>
+      // Payload Dispatcher to Port 9021
+      function dispatchBytesTo9021(bytes, name) {
+        return new Promise(function(resolve, reject) {
+          var con = document.getElementById("console");
+          if (con) {
+            con.append("[+] Dispatching " + name + " (" + bytes.length + " bytes) to ELFLDR on port 9021...\n");
+            con.scrollTop = con.scrollHeight;
+          }
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "http://127.0.0.1:9021/", true);
+          xhr.setRequestHeader("Content-Type", "application/octet-stream");
+          xhr.timeout = 10000;
+          xhr.onload = function() {
+            if (con) {
+              con.append("[+] Successfully delivered " + name + " to ELFLDR on port 9021!\n");
+              con.scrollTop = con.scrollHeight;
+            }
+            showJbSuccessPopup(name + " Dispatched &bull; Payload Active");
+            resolve();
+          };
+          xhr.onerror = function() {
+            if (con) {
+              con.append("[-] Connection to port 9021 failed. Make sure exploit is running.\n");
+              con.scrollTop = con.scrollHeight;
+            }
+            reject(new Error("Failed to connect to 9021"));
+          };
+          xhr.ontimeout = function() {
+            if (con) {
+              con.append("[-] Port 9021 connection timed out.\n");
+              con.scrollTop = con.scrollHeight;
+            }
+            reject(new Error("Timeout"));
+          };
+          xhr.send(bytes);
+        });
+      }
 
-    <!-- Credits Footer -->
-    <div class="credits-box">
-      <div class="credits-title">LONELY 2 PS4 EXPLOIT SUITE &middot; GOD OF WAR EDITION</div>
-      <p style="margin: 0 0 6px 0;">Based on <b>lonely2-host</b> &amp; <b>wobkot / relapse</b> core exploit research.</p>
-      <p style="margin: 0; opacity: 0.85;">
-        <b>Kernel &amp; WebKit Research:</b> TheFlow, Dr. Yenyen, ufm42, Jordy, Sleirsgoevy, Flatz, Specter, EchoStretch, cow, nhk, bollarz, EarthOnion.<br>
-        <b>Payloads:</b> SiSTRo (GoldHEN), John T&ouml;rnblom (elfldr), Al Azif, Scene Collective.
-      </p>
-    </div>
-  </div>
+      // Payload Card Click Handlers
+      (function() {
+        var buttons = document.querySelectorAll("#payloadGrid .btn-send");
+        buttons.forEach(function(btn) {
+          btn.addEventListener("click", function() {
+            var payloadFile = btn.getAttribute("data-payload");
+            var action = btn.getAttribute("data-action");
 
-  <script src="src/main.js"></script>
-  <script src="src/site.js"></script>
-</body>
+            if (action === "clean") {
+              alert("Clean Boot Mode Active:\n\nELFLDR is listening on port 9021 without injecting any payloads. Ready for remote or custom dispatch.");
+              return;
+            }
+            if (action === "netcat") {
+              alert("Remote Netcat Payload Loader:\n\nSend any payload from your PC/phone using Netcat:\n\nnc <PS4_IP> 9021 < payload.bin\n\nOr use Valkyrie Forge below to load files directly in this browser!");
+              return;
+            }
+            if (action === "klog") {
+              alert("Kernel Logger is active:\n\nReal-time kernel events are streamed directly into the console above.");
+              return;
+            }
+
+            if (!payloadFile) return;
+
+            btn.textContent = "SENDING...";
+            fetch("./payloads/" + payloadFile, { cache: "no-store" })
+              .then(function(res) {
+                if (!res.ok) throw new Error("File not found on host");
+                return res.arrayBuffer();
+              })
+              .then(function(buf) {
+                return dispatchBytesTo9021(new Uint8Array(buf), payloadFile);
+              })
+              .then(function() {
+                btn.textContent = "SENT";
+                setTimeout(function() { btn.textContent = "SEND"; }, 3000);
+              })
+              .catch(function(err) {
+                alert("Payload '" + payloadFile + "' is not on the host server.\n\nPlease drop your " + payloadFile + " into the Valkyrie Forge box below to dispatch it directly to port 9021!");
+                btn.textContent = "SEND";
+              });
+          });
+        });
+      })();
+
+      // Valkyrie Forge: Custom Payload Drag & Drop / File Picker
+      (function() {
+        var dropZone = document.getElementById("customDropZone");
+        var fileInput = document.getElementById("customFileInput");
+        var statusEl = document.getElementById("customDropStatus");
+        if (!dropZone || !fileInput) return;
+
+        function handleFile(file) {
+          if (!file) return;
+          if (statusEl) statusEl.textContent = "Forging " + file.name + " (" + Math.round(file.size / 1024) + " KB)...";
+          var con = document.getElementById("console");
+          if (con) {
+            con.append("[+] [Valkyrie Forge] Reading custom payload: " + file.name + "...\n");
+            con.scrollTop = con.scrollHeight;
+          }
+
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var bytes = new Uint8Array(e.target.result);
+            if (statusEl) statusEl.textContent = "Dispatching " + file.name + " to 127.0.0.1:9021...";
+            dispatchBytesTo9021(bytes, file.name)
+              .then(function() {
+                if (statusEl) statusEl.textContent = "\u2694 " + file.name + " dispatched successfully!";
+              })
+              .catch(function(err) {
+                if (statusEl) statusEl.textContent = "Failed: " + err.message;
+              });
+          };
+          reader.onerror = function() {
+            if (statusEl) statusEl.textContent = "Error reading file";
+          };
+          reader.readAsArrayBuffer(file);
+        }
+
+        dropZone.addEventListener("click", function() { fileInput.click(); });
+        fileInput.addEventListener("change", function(e) {
+          if (e.target.files && e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+        dropZone.addEventListener("dragover", function(e) { e.preventDefault(); dropZone.classList.add("drop-active"); });
+        dropZone.addEventListener("dragleave", function(e) { e.preventDefault(); dropZone.classList.remove("drop-active"); });
+        dropZone.addEventListener("drop", function(e) {
+          e.preventDefault();
+          dropZone.classList.remove("drop-active");
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+      })();
+    </script>
+  </body>
 </html>
